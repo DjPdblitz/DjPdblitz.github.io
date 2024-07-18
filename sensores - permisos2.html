@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sensor Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .sensor-data { margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>Sensor Data</h1>
+    <div class="sensor-data">
+        <h2>Accelerometer</h2>
+        <p>X: <span id="accelerationX">0</span></p>
+        <p>Y: <span id="accelerationY">0</span></p>
+        <p>Z: <span id="accelerationZ">0</span></p>
+    </div>
+
+    <script>
+        function handleMotionEvent(event) {
+            var acceleration = event.accelerationIncludingGravity;
+
+            if (acceleration) {
+                document.getElementById('accelerationX').innerText = acceleration.x !== null ? acceleration.x.toFixed(2) : 'N/A';
+                document.getElementById('accelerationY').innerText = acceleration.y !== null ? acceleration.y.toFixed(2) : 'N/A';
+                document.getElementById('accelerationZ').innerText = acceleration.z !== null ? acceleration.z.toFixed(2) : 'N/A';
+            } else {
+                document.getElementById('accelerationX').innerText = 'N/A';
+                document.getElementById('accelerationY').innerText = 'N/A';
+                document.getElementById('accelerationZ').innerText = 'N/A';
+            }
+        }
+
+        function requestSensorPermissions() {
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                // iOS 13+ device
+                DeviceMotionEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            window.addEventListener('devicemotion', handleMotionEvent);
+                        } else {
+                            alert('Permission denied');
+                        }
+                    })
+                    .catch(console.error);
+            } else if (window.DeviceMotionEvent) {
+                // Android or other devices
+                window.addEventListener('devicemotion', handleMotionEvent);
+            } else {
+                alert('DeviceMotion not supported');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            requestSensorPermissions();
+        });
+    </script>
+</body>
+</html>
